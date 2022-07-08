@@ -1,0 +1,26 @@
+#page{
+    width: 1000px;
+    margin:0 auto;
+}
+header,nav,footer{
+    background-color:paleturquoise;
+    height: 50px;
+}
+#main{
+    display: flex;
+    justify-content: space-between;
+}
+aside{flex-grow: 1;
+    background-color: pink;
+    }
+section{flex-grow: 3;
+        min-height: 600px;}
+.table{
+   justify-content: center;
+}
+#pagination{
+    justify-content: center;
+}
+h1{
+    text-align: center;
+}

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/script/main.js"></script>
+    <title>Document</title>
+    <script>
+        function getPage(){
+            let page=parseInt(location.search.substr(6));
+                if(isNaN(page)==true);
+                    return 1;
+                    return page;
+            }
+        async function getResponse(url,pageno){
+            const params = ({url,pageno});
+            return await $.ajax({url:url, data:params});
+        }
+        function printBoardList({boardList}){
+            const $list = $('#list');
+            for(b of boardList){
+                const $tr = $('<tr>').appendTo($list);
+                $('<td>').text(b.bno).appendTo($tr);
+                const $td = $('<td>').appendTo($tr);
+                $('<a>').attr('href',`/read.html?no=${b.bno}`).text(b.title).appendTo($td);
+                $('<td>').text(b.writeTime).appendTo($tr);
+                $('<td>').text(b.readCnt).appendTo($tr);
+            }
+        }
+        const getPagination=({pageno,pagesize,totalcount,blocksize=5})=>{
+            const countOfPage=Math.ceil(totalcount/pagesize);
+            const prev = Math.floor((pageno-1)/blocksize)*blocksize;
+            const start = prev+1;
+            let end = prev+blocksize;
+            let next = end+1;
+            if(end>=countOfPage){
+                end=countOfPage;
+                next=0;
+        }
+            return{pageno,prev,start,end,next}
+    }
+        function printPagination({pageno,prev,start,end,next}){
+            const $p = $('#pagination');
+            if(prev>0){
+                const $li = $('<li class="page-item">').appendTo($p);
+                $(`<a  class="page-link" href="/list.html?pageno=${prev}">`).text('previous').appendTo($li);
+            }
+            for(let i=start; i<=end; i++){
+                 const $li = $('<li class="page-item">').appendTo($p);
+                $(`<a  class="page-link" href="/list.html?pageno=${i}">`).text(i).appendTo($li);
+                if(i===pageno)
+                    $li.addClass('active');
+        }
+            if(next>0){
+                const $li = $('<li class="page-item">').appendTo($p);
+                $(`<a  class="page-link" href="/list.html?pageno=${next}">`).text('next').appendTo($li);
+            }
+    }
+        $(document).ready(async function(){
+            const pagesize=10;
+            const url='http://192.168.0.34:8081/board/all';
+            init();
+            const page=getPage();
+            const response=await getResponse(url,page);
+            console.log(response);
+            printBoardList(response);
+            const pagination=getPagination(response);
+            printPagination(pagination);
+        })
+    </script>
+</head>
+<body>
+    <div id="page">
+        <header></header>
+        <nav></nav>
+        <div id="main">
+            <aside></aside>
+            <section>
+                <table class="table">
+                    <thead></thead>
+                    <tr>
+                        <td>번호</td>
+                        <td>제목</td>
+                        <td>작성일</td>
+                        <td>읽기</td>
+                    </tr>
+                    <tbody id="list"></tbody>
+                </table>
+                <ul class="pagination" id="pagination"></ul>
+            </section>
+         </div>   
+        <footer></footer>
+    </div>   
+</body>
+</html>
